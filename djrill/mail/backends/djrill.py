@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address, DEFAULT_ATTACHMENT_MIME_TYPE
+from django.utils.encoding import force_text
+from django.utils.functional import Promise
 
 # Oops: this file has the same name as our app, and cannot be renamed.
 #from djrill import MANDRILL_API_URL, MandrillAPIError, NotSupportedByMandrillError
@@ -138,7 +140,10 @@ class DjrillBackend(BaseEmailBackend):
         Raises NotSupportedByMandrillError for any standard EmailMessage
         features that cannot be accurately communicated to Mandrill.
         """
-        sender = sanitize_address(message.from_email, message.encoding)
+        sender = message.from_email
+        if isinstance(sender, Promise):
+            sender = force_text(sender, message.encoding)
+        sender = sanitize_address(sender, message.encoding)
         from_name, from_email = parseaddr(sender)
 
         to_list = self._make_mandrill_to_list(message, message.to, "to")
