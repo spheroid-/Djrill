@@ -2,8 +2,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address, DEFAULT_ATTACHMENT_MIME_TYPE
-from django.utils.encoding import force_text
 from django.utils.functional import Promise
+
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_unicode as force_text
 
 # Oops: this file has the same name as our app, and cannot be renamed.
 #from djrill import MANDRILL_API_URL, MandrillAPIError, NotSupportedByMandrillError
